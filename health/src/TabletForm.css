@@ -1,0 +1,47 @@
+/* Styling for the form container */
+.tablet-form-container {
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    /* background-color: #f5f5f5; */
+  }
+  
+  /* Styling for form groups */
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  /* Styling for labels */
+  label {
+    display: block;
+    font-weight: bold;
+  }
+  
+  /* Styling for input fields and textareas */
+  input[type="text"],
+  input[type="number"],
+  input[type="date"],
+  textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 16px;
+  }
+  
+  /* Styling for the submit button */
+  button[type="submit"] {
+    background-color: #007bff; /* Blue color for the button */
+    /* color: white; */
+    padding: 10px 20px;
+    border: none;
+    border-radius: 3px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  button[type="submit"]:hover {
+    background-color: #0056b3; /* Darker blue color on hover */
+  }
+  
