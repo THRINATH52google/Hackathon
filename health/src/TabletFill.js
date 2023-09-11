@@ -4,6 +4,18 @@ import './TabletForm.css'
 import { useNavigate } from "react-router-dom"
 
 export default function TabletFill(){
+  const [accessToken, setAccessToken] = React.useState()
+  const [tokenPlaceholder, setTokenPlaceholder] = React.useState()
+  const [piiData, setPiiData] = React.useState()
+  const [piiDataPlaceholder, setPiiDataPlaceholder] = React.useState()
+  const [capturedFileId, setCapturedFileId] = React.useState("")  //id of image file in Capture Service
+  const [extractedData, setExtractedData] = React.useState()
+  const [extractedDataDisplay, setExtractedDataDisplay] = React.useState()
+  const [capFileIdPlaceholder, setCapFileIdPlaceholder] = React.useState("")
+  const [retrieveStatus, setRetrieveStatus] = React.useState("")
+  const [retrieveCaptureStatus, setRetrieveCaptureStatus] = React.useState("")
+  const [retrieveSendToDBStatus, setRetrieveSendToDBStatus] = React.useState("")
+  const [tmeResults, setTMEResults] = React.useState([])
 
     const navigate = useNavigate();
     const[tabletInfo, setTabletInfo] = useState({
@@ -23,6 +35,7 @@ export default function TabletFill(){
       };
 
       const handleSubmit = async (e) => {
+        getAuthToken();
         e.preventDefault();
     
         // Make an API request here using the tabletInfo state
@@ -50,6 +63,37 @@ export default function TabletFill(){
           console.error('Network error:', error);
         }
       };
+      
+      async function getAuthToken() {
+        setAccessToken("")
+        setTokenPlaceholder("...Requesting New Authentication Token")
+    
+        const url = `${properties.base_url}/tenants/${properties.tenant_id}/oauth2/token`
+        const requestOptions = {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify({
+                client_id: properties.client_id,
+                client_secret: properties.client_secret,
+                grant_type: "password",
+                username: properties.username,
+                password: properties.password
+            })
+        }
+    
+        const response = await fetch(url, requestOptions)
+    
+        if (!response.ok) {
+          setTokenPlaceholder("Error acquiring authentication token")
+          alert("Authentication Failed. Please verify your credentials in properties.js")
+          return
+        }
+        const data = await response.json()
+        setAccessToken(data.access_token)
+        setTokenPlaceholder("")
+      }
 
     return(
         <div className="tablet-form-container">
