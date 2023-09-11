@@ -3,10 +3,25 @@ import axios from "axios"
 import React, { useState } from 'react'
 import './TabletForm.css'
 import { useNavigate } from "react-router-dom"
+import {properties} from './properties';
 
 
 export default function PatientFill(){
+  const [accessToken, setAccessToken] = React.useState()
+  const [tokenPlaceholder, setTokenPlaceholder] = React.useState()
+  const [piiData, setPiiData] = React.useState()
+  const [piiDataPlaceholder, setPiiDataPlaceholder] = React.useState()
+  const [capturedFileId, setCapturedFileId] = React.useState("")  //id of image file in Capture Service
+  const [extractedData, setExtractedData] = React.useState()
+  const [extractedDataDisplay, setExtractedDataDisplay] = React.useState()
+  const [capFileIdPlaceholder, setCapFileIdPlaceholder] = React.useState("")
+  const [retrieveStatus, setRetrieveStatus] = React.useState("")
+  const [retrieveCaptureStatus, setRetrieveCaptureStatus] = React.useState("")
+  const [retrieveSendToDBStatus, setRetrieveSendToDBStatus] = React.useState("")
+  const [tmeResults, setTMEResults] = React.useState([])
 
+
+  
     const navigate = useNavigate();
     const[patientInfo, setPatinetInfo] = useState({
         occupation: '',
@@ -77,7 +92,59 @@ export default function PatientFill(){
         heatIntolerance: false,
         appointmentDate: null,
     })
+
+    async function getAuthToken() {
+      setAccessToken("")
+      setTokenPlaceholder("...Requesting New Authentication Token")
+  
+      const url = `${properties.base_url}/tenants/${properties.tenant_id}/oauth2/token`
+      const requestOptions = {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json' 
+          },
+          body: JSON.stringify({
+              client_id: properties.client_id,
+              client_secret: properties.client_secret,
+              grant_type: "password",
+              username: properties.username,
+              password: properties.password
+          })
+      }
+  
+      const response = await fetch(url, requestOptions)
+  
+      if (!response.ok) {
+        setTokenPlaceholder("Error acquiring authentication token")
+        alert("Authentication Failed. Please verify your credentials in properties.js")
+        return
+      }
+      const data = await response.json()
+      setAccessToken(data.access_token)
+      setTokenPlaceholder("")
+    }
+
+    async function sendToDBServer() {
+      if (!extractedData) {
+        setRetrieveSendToDBStatus("...No data to insert into database")
+        return
+      }
+  
+      setRetrieveSendToDBStatus("...Sending extracted data to Database (please wait)")
+  
+      const url = properties.server_url
+      axios.post(url, extractedData)
+      .then(res => {
+        setRetrieveSendToDBStatus("..."+res.data)
+      })
+      .catch(error => {
+        setRetrieveSendToDBStatus("..."+error.message)
+      })
+    }
+  
+
     const handleInputChange = (e) => {
+      getAuthToken();
         const { name, value } = e.target;
         setPatinetInfo({ ...patientInfo, [name]: value });
       };
